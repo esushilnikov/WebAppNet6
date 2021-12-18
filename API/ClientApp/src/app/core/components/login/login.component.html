@@ -1,0 +1,17 @@
+<form [formGroup]="form">
+    <div class="row">
+        <div class="col-12">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" [formControlName]="controlName.userName"/>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" [formControlName]="controlName.password"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <button [textContent]="'Login'" (click)="submit()" type="button"></button>
+        </div>
+    </div>
+</form>

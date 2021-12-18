@@ -1,0 +1,10 @@
+<ng-container *ngIf="!isAuthenticated">
+    <a [routerLink]="['login']">Login</a>
+</ng-container>
+
+<ng-container *ngIf="isAuthenticated">
+    <span [textContent]="userName$ | async"></span>
+    <button type="button"
+            [textContent]="'Log out'"
+            (click)="logout()"></button>
+</ng-container>

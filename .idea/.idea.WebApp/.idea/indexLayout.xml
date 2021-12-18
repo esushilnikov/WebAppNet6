@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="UserContentModel">
+    <attachedFolders>
+      <Path>src</Path>
+      <Path>src/API</Path>
+      <Path>src/API/WebApp.API</Path>
+      <Path>src/Core</Path>
+      <Path>src/Infrastructure</Path>
+      <Path>test</Path>
+    </attachedFolders>
+    <explicitIncludes>
+      <Path>src/Core</Path>
+    </explicitIncludes>
+    <explicitExcludes>
+      <Path>src</Path>
+    </explicitExcludes>
+  </component>
+</project>
