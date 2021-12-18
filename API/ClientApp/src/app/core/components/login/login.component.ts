@@ -21,13 +21,13 @@ export class LoginComponent implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
-            [this.controlName.userName]: this.fb.control('', Validators.required),
-            [this.controlName.password]: this.fb.control('', Validators.required),
+            [this.controlName.email]: this.fb.control('jeff.smith@mail.ua', Validators.required),
+            [this.controlName.password]: this.fb.control('Qwerty!23456', Validators.required),
         });
     }
 
     submit(): void {
-        this.authorizeService.login$(this.form.value).subscribe(() => this.router.navigate(['/']));
+        this.authorizeService.authenticate(this.form.value).subscribe(() => this.router.navigate(['/']));
     }
 
 }

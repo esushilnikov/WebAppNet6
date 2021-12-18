@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.AspNetCore.Identity;
 
-namespace Domain.Models;
+namespace Identity.Models;
 
 public class ApplicationUser : IdentityUser
 {

@@ -1,4 +1,4 @@
 export enum LoginForm {
-    userName = 'userName',
+    email = 'email',
     password = 'password'
 }

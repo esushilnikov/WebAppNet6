@@ -23,9 +23,13 @@ export class AuthorizeService {
         return this.userState.asObservable().pipe(map(u => !!u));
     }
 
-    login$(model: SignInModel): Observable<any> {
-        return this.http.post<any>('api/account/sign-in', model).pipe(
+    authenticate(model: SignInModel): Observable<any> {
+        return this.http.post<any>('api/account/authenticate', model).pipe(
             tap(accessToken => this.localStorageService.setItem('access_token', accessToken)));
+    }
+
+    register(model: SignInModel): Observable<any> {
+      return this.http.post<any>('api/account/register', model);
     }
 
     logout$(): Observable<boolean> {
