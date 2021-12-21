@@ -1,8 +1,7 @@
 ﻿using System.Security.Claims;
 using Application.Constants.Persistence;
-using Microsoft.AspNetCore.Http;
 
-namespace Persistence.MiddleWares;
+namespace WebApp.API.Middleware;
 
 public class UserStateInitializer
 {
@@ -18,7 +17,8 @@ public class UserStateInitializer
         var emailClaimValue = context.User.FindFirstValue(ClaimTypes.Email);
         if (!string.IsNullOrEmpty(emailClaimValue))
         {
-            context.Items["UserAccount"] =
+            // TODO: use cache to restore user state
+            context.Items["UserState"] =
                 await userRepository.GetUserAccountAsync(emailClaimValue);
         }
 

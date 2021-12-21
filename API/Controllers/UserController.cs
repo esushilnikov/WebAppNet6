@@ -20,7 +20,7 @@ public class UserController : WebAppBaseController
     [Route("")]
     public async Task<IActionResult> GetCurrentUser()
     {
-        return Ok(await _mediator.Send(new GetUserQuery { UserId = UserAccount.Id }));
+        return Ok(await _mediator.Send(new GetUserQuery { UserId = UserState.Id }));
     }
 
     [Authorize]

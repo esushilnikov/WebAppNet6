@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthorizeService } from '../../services/auth/authorize.service';
-import { LoginForm } from './login.model';
+import { AuthorizeService } from '@core/services/auth/authorize.service';
+import { LoginForm } from '@core/components/login/login.model';
 
 @Component({
     selector: 'login',
@@ -26,8 +26,12 @@ export class LoginComponent implements OnInit {
         });
     }
 
-    submit(): void {
-        this.authorizeService.authenticate(this.form.value).subscribe(() => this.router.navigate(['/']));
+    login(): void {
+        this.authorizeService.authenticate(this.form.value).subscribe();
+    }
+
+    register(): void {
+        this.router.navigate(['register']);
     }
 
 }

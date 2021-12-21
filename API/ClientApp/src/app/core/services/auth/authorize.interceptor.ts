@@ -1,54 +1,50 @@
+import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { LocalStorageService } from 'src/app/core/services/local-storage.service';
-import { AuthorizeService } from './authorize.service';
-import { mergeMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthModel } from '@core/models/auth.model';
+import { LocalStorageService } from '@core/services/local-storage.service';
+import { catchError, EMPTY, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class AuthorizeInterceptor implements HttpInterceptor {
-  constructor(private localStorageService: LocalStorageService) { }
+    constructor(private localStorageService: LocalStorageService,
+                private router: Router) {
+    }
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return this.processRequestWithToken(this.localStorageService.getItem('access_token'), req, next);
-  }
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        return this.processRequestWithToken(this.getToken(), req, next);
+    }
 
-  // Checks if there is an access_token available in the authorize service
-  // and adds it to the request in case it's targeted at the same origin as the
-  // single page application.
-  private processRequestWithToken(token: string | null, req: HttpRequest<any>, next: HttpHandler) {
-    if (!!token) {
-      req = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
+    private processRequestWithToken(token: string | null, req: HttpRequest<any>, next: HttpHandler) {
+        if (!!token) {
+            req = req.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
         }
-      });
+
+        return next.handle(req).pipe(
+            catchError(err => {
+                if (err instanceof HttpErrorResponse) {
+                    if (err.status === 401) {
+                        this.router.navigate(['login']);
+                    }
+                }
+                return EMPTY;
+            })
+        );
     }
 
-    return next.handle(req);
-  }
-
-  private isSameOriginUrl(req: any) {
-    // It's an absolute url with the same origin.
-    if (req.url.startsWith(`${window.location.origin}/`)) {
-      return true;
+    private getToken(): string {
+        const auth = this.localStorageService.getItem('auth');
+        if (auth) {
+            const authData = JSON.parse(auth) as AuthModel;
+            return authData.token;
+        }
+        console.warn('TOKEN is not available');
+        return '';
     }
-
-    // It's a protocol relative url with the same origin.
-    // For example: //www.example.com/api/Products
-    if (req.url.startsWith(`//${window.location.host}/`)) {
-      return true;
-    }
-
-    // It's a relative url like /api/Products
-    if (/^\/[^\/].*/.test(req.url)) {
-      return true;
-    }
-
-    // It's an absolute or protocol relative url that
-    // doesn't have the same origin.
-    return false;
-  }
 }

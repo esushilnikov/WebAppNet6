@@ -5,11 +5,5 @@ namespace WebApp.API.Controllers;
 
 public class WebAppBaseController : Controller
 {
-    public UserAccount UserAccount
-    {
-        get
-        {
-            return HttpContext.Items["UserAccount"] as UserAccount; 
-        }
-    }
+    protected UserAccount? UserState => HttpContext.Items["UserState"] as UserAccount;
 }

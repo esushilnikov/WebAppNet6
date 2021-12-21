@@ -1,49 +1,51 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, concat, map, Observable, share } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
-import { AuthModel } from 'src/app/core/models/auth.model';
-import { SignInModel } from '../../models/sign-in.model';
-import { UserModel } from '../../models/user.model';
-import { LocalStorageService } from '../local-storage.service';
+import { Router } from '@angular/router';
+import { AuthModel } from '@core/models/auth.model';
+import { RegisterModel } from '@core/models/register.model';
+import { SignInModel } from '@core/models/sign-in.model';
+import { UserModel } from '@core/models/user.model';
+import { LocalStorageService } from '@core/services/local-storage.service';
+import { BehaviorSubject, concat, filter, Observable, take } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthorizeService {
 
+    private readonly StorageAuthKey = 'auth';
+
     private readonly userState = new BehaviorSubject<UserModel | null>(null);
 
-    user$ = concat(this.userState.asObservable().pipe(take(1)), this.fetch$()).pipe(share());
+    userState$ = concat(
+        this.userState.asObservable().pipe(take(1), filter(x => !!x)),
+        this.getApiUser().pipe(tap(user => this.userState.next(user))),
+        this.userState.asObservable());
 
     constructor(private http: HttpClient,
+                private router: Router,
                 private localStorageService: LocalStorageService) {
-    }
-
-    isAuthenticated(): Observable<boolean> {
-        return this.userState.asObservable().pipe(map(u => !!u));
     }
 
     authenticate(model: SignInModel): Observable<AuthModel> {
         return this.http.post<AuthModel>('api/account/authenticate', model).pipe(
-            tap(x => this.localStorageService.setItem('access_token', x.token)));
+            tap(x => this.localStorageService.setItem(this.StorageAuthKey, JSON.stringify(x))),
+            tap(() => this.router.navigate(['/'])));
     }
 
-    register(model: SignInModel): Observable<any> {
-      return this.http.post<any>('api/account/register', model);
+    register(model: RegisterModel): Observable<any> {
+        return this.http.post<any>('api/account/register', model).pipe(
+            tap(() => this.router.navigate(['login'])));
     }
 
-    logout$(): Observable<boolean> {
+    logout(): void {
         this.userState.next(null);
-        return this.http.post<boolean>('api/account/sign-out', {});
+        this.localStorageService.removeItem(this.StorageAuthKey);
+        this.router.navigate(['login']);
     }
 
-    getUser(): Observable<UserModel | null> {
-        return concat(this.userState.asObservable().pipe(take(1)), this.fetch$()).pipe(share());
-    }
-
-    private fetch$(): Observable<UserModel> {
-        return this.http.get<UserModel>('api/user').pipe(
-            tap(user => this.userState.next(user)));
+    private getApiUser(): Observable<UserModel> {
+        return this.http.get<UserModel>('api/user');
     }
 }

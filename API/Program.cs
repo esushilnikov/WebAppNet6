@@ -6,8 +6,8 @@ using Identity.Seed;
 using Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Persistence;
-using Persistence.MiddleWares;
 using Persistence.Seed;
+using WebApp.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,17 +1,26 @@
-<form [formGroup]="form">
-    <div class="row">
-        <div class="col-12">
-            <label class="form-label">Name</label>
-            <input type="text" class="form-control" [formControlName]="controlName.email"/>
+<div class="d-flex justify-content-center">
+    <form [formGroup]="form">
+        <div class="row">
+            <div class="col-12">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" [formControlName]="controlName.email"/>
+            </div>
         </div>
-        <div class="col-12">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" [formControlName]="controlName.password"/>
+        <div class="row mt-2">
+            <div class="col-12">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" [formControlName]="controlName.password"/>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-2">
-            <button [textContent]="'Login'" (click)="submit()" type="button"></button>
+        <div class="row mt-4">
+            <div class="col-12">
+                <button [textContent]="'Login'" (click)="login()" type="button" class="form-control btn-primary"></button>
+            </div>
         </div>
-    </div>
-</form>
+        <div class="row mt-4">
+            <div class="col-12">
+                <button [textContent]="'Register'" (click)="register()" type="button" class="form-control btn-info"></button>
+            </div>
+        </div>
+    </form>
+</div>

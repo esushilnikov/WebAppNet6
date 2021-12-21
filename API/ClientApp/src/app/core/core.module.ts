@@ -1,18 +1,20 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { NavMenuComponent } from './components/nav-menu/nav-menu.component';
-import { LoginComponent } from './components/login/login.component';
-import { LoginMenuComponent } from './components/nav-menu/login-menu/login-menu.component';
+import { HomeComponent } from '@core/components/home/home.component';
+import { LoginComponent } from '@core/components/login/login.component';
+import { LoginMenuComponent } from '@core/components/nav-menu/login-menu/login-menu.component';
+import { NavMenuComponent } from '@core/components/nav-menu/nav-menu.component';
+import { RegisterComponent } from '@core/components/register/register.component';
 
 @NgModule({
     declarations: [
         HomeComponent,
         NavMenuComponent,
         LoginComponent,
-        LoginMenuComponent
+        LoginMenuComponent,
+        RegisterComponent
     ],
     exports: [
         NavMenuComponent
