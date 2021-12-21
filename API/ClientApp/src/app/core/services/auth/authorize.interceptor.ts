@@ -44,7 +44,7 @@ export class AuthorizeInterceptor implements HttpInterceptor {
             const authData = JSON.parse(auth) as AuthModel;
             return authData.token;
         }
-        console.warn('TOKEN is not available');
+        this.router.navigate(['login']);
         return '';
     }
 }
