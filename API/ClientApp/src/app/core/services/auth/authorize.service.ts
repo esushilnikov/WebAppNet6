@@ -6,7 +6,7 @@ import { RegisterModel } from '@core/models/register.model';
 import { SignInModel } from '@core/models/sign-in.model';
 import { UserModel } from '@core/models/user.model';
 import { LocalStorageService } from '@core/services/local-storage.service';
-import { BehaviorSubject, concat, filter, Observable, take } from 'rxjs';
+import { BehaviorSubject, concat, concatMap, filter, Observable, take } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 @Injectable({
@@ -15,12 +15,11 @@ import { tap } from 'rxjs/operators';
 export class AuthorizeService {
 
     private readonly StorageAuthKey = 'auth';
-
     private readonly userState = new BehaviorSubject<UserModel | null>(null);
 
     userState$ = concat(
         this.userState.asObservable().pipe(take(1), filter(x => !!x)),
-        this.getApiUser().pipe(tap(user => this.userState.next(user))),
+        this.getApiUser(),
         this.userState.asObservable());
 
     constructor(private http: HttpClient,
@@ -28,9 +27,10 @@ export class AuthorizeService {
                 private localStorageService: LocalStorageService) {
     }
 
-    authenticate(model: SignInModel): Observable<AuthModel> {
+    authenticate(model: SignInModel): Observable<any> {
         return this.http.post<AuthModel>('api/account/authenticate', model).pipe(
             tap(x => this.localStorageService.setItem(this.StorageAuthKey, JSON.stringify(x))),
+            concatMap(() => this.getApiUser()),
             tap(() => this.router.navigate(['/'])));
     }
 
@@ -46,6 +46,6 @@ export class AuthorizeService {
     }
 
     private getApiUser(): Observable<UserModel> {
-        return this.http.get<UserModel>('api/user');
+        return this.http.get<UserModel>('api/user').pipe(tap(x => this.userState.next(x)));
     }
 }
