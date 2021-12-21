@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Seed;
 
-public static class DbInitializer
+public static class DbIdentityInitializer
 {
     public static async Task InitializeUsersAsync(WebAppIdentityDbContext context, UserManager<ApplicationUser> userManager)
     {
@@ -15,24 +15,18 @@ public static class DbInitializer
             {
                 new()
                 {
-                    FirstName = "John",
-                    LastName = "Doe",
                     UserName = "john.doe",
                     Email = "john.doe@mail.ua",
                     EmailConfirmed = true
                 },
                 new()
                 {
-                    FirstName = "Garry",
-                    LastName = "Lehman",
                     UserName = "garry.lehman",
                     Email = "garry.lehman@mail.ua",
                     EmailConfirmed = true
                 },
                 new()
                 {
-                    FirstName = "Jeff",
-                    LastName = "Smith",
                     UserName = "jeff.smith",
                     Email = "jeff.smith@mail.ua",
                     EmailConfirmed = true

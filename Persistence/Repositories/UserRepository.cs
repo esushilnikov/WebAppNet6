@@ -1,30 +1,20 @@
-﻿using Application.Persistence;
+﻿using Application.Constants.Persistence;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Persistence.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository : BaseRepository<UserAccount>, IUserRepository
 {
     private readonly WebAppDbContext _context;
     
-    public UserRepository(WebAppDbContext context)
+    public UserRepository(WebAppDbContext context) : base(context)
     {
         _context = context;
     }
 
-    public async Task<UserAccount?> GetUserAsync(string id)
+    public async Task<UserAccount?> GetUserAccountAsync(string email)
     {
-        return await _context.UserAccounts.FirstOrDefaultAsync(x => x.Id == id);
-    }
-
-    public async Task<UserAccount?> GetUserAsync(string userName, string password)
-    {
-        return await _context.UserAccounts.FirstOrDefaultAsync(x => x.UserName == userName || x.Email == userName);
-    }
-
-    public async Task<IEnumerable<UserAccount>> GetAllAsync()
-    {
-        return await _context.UserAccounts.ToListAsync();
+        return await _context.UserAccounts.FirstOrDefaultAsync(x => x.Email == email);
     }
 }

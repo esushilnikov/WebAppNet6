@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, concat, map, Observable, share } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
+import { AuthModel } from 'src/app/core/models/auth.model';
 import { SignInModel } from '../../models/sign-in.model';
 import { UserModel } from '../../models/user.model';
 import { LocalStorageService } from '../local-storage.service';
@@ -23,9 +24,9 @@ export class AuthorizeService {
         return this.userState.asObservable().pipe(map(u => !!u));
     }
 
-    authenticate(model: SignInModel): Observable<any> {
-        return this.http.post<any>('api/account/authenticate', model).pipe(
-            tap(accessToken => this.localStorageService.setItem('access_token', accessToken)));
+    authenticate(model: SignInModel): Observable<AuthModel> {
+        return this.http.post<AuthModel>('api/account/authenticate', model).pipe(
+            tap(x => this.localStorageService.setItem('access_token', x.token)));
     }
 
     register(model: SignInModel): Observable<any> {

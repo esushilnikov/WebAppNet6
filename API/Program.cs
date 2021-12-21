@@ -1,10 +1,13 @@
 using Application;
+using Application.Constants.Persistence;
 using Identity;
 using Identity.Models;
 using Identity.Seed;
 using Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Persistence;
+using Persistence.MiddleWares;
+using Persistence.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +28,23 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<WebAppIdentityDbContext>();
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        DbInitializer.InitializeUsersAsync(context, userManager).Wait();
+        DbIdentityInitializer .InitializeUsersAsync(context, userManager).Wait();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<WebAppDbContext>();
+        var userRepository = services.GetRequiredService<IUserRepository>();
+        DbInitializer.InitializeUserAccountsAsync(context, userRepository).Wait();
     }
     catch (Exception ex)
     {
@@ -49,6 +68,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<UserStateInitializer>();
 
 app.MapControllerRoute(
     name: "default",

@@ -43,9 +43,9 @@ public class WebAppAuthenticationService : IWebAppAuthenticationService
             throw new Exception($"Credentials for '{request.Email} aren't valid'.");
         }
 
-        JwtSecurityToken jwtSecurityToken = await GenerateToken(user);
+        var jwtSecurityToken = await GenerateToken(user);
 
-        AuthenticationResponse response = new AuthenticationResponse
+        var response = new AuthenticationResponse
         {
             Id = user.Id,
             Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
@@ -68,8 +68,6 @@ public class WebAppAuthenticationService : IWebAppAuthenticationService
         var user = new ApplicationUser
         {
             Email = request.Email,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
             UserName = request.UserName,
             EmailConfirmed = true
         };
@@ -84,38 +82,25 @@ public class WebAppAuthenticationService : IWebAppAuthenticationService
             {
                 return new RegistrationResponse() { UserId = user.Id };
             }
-            else
-            {
-                throw new Exception($"{result.Errors}");
-            }
+
+            throw new Exception($"{result.Errors}");
         }
-        else
-        {
-            throw new Exception($"Email {request.Email} already exists.");
-        }
+
+        throw new Exception($"Email {request.Email} already exists.");
     }
 
     private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
     {
         var userClaims = await _userManager.GetClaimsAsync(user);
-        //var roles = await _userManager.GetRolesAsync(user);
-
-        var roleClaims = new List<Claim>();
-
-        /*for (int i = 0; i < roles.Count; i++)
-        {
-            roleClaims.Add(new Claim("roles", roles[i]));
-        }*/
 
         var claims = new[]
             {
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("uid", user.Id)
             }
-            .Union(userClaims)
-            .Union(roleClaims);
+            .Union(userClaims);
+            //.Union(await GetRolesClaims(user));
 
         var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
@@ -127,5 +112,19 @@ public class WebAppAuthenticationService : IWebAppAuthenticationService
             expires: DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
             signingCredentials: signingCredentials);
         return jwtSecurityToken;
+    }
+
+    private async Task<List<Claim>> GetRolesClaims(ApplicationUser user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var roleClaims = new List<Claim>();
+
+        for (int i = 0; i < roles.Count; i++)
+        {
+            roleClaims.Add(new Claim("roles", roles[i]));
+        }
+        
+        return roleClaims;
     }
 }
